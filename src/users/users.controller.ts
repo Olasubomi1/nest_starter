@@ -1,9 +1,20 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import {
+  ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiQuery,
   ApiTags,
@@ -22,12 +33,16 @@ export class UsersController {
   }
 
   @ApiOkResponse({ type: User, isArray: false })
+  @ApiNotFoundResponse()
   @Get(':id')
-  getUserById(@Param('id') id: string): User {
-    return this.userService.findById(Number(id));
+  getUserById(@Param('id', ParseIntPipe) id: number): User {
+    const user = this.userService.findById(id);
+    if (!user) throw new NotFoundException();
+    return user;
   }
 
   @ApiCreatedResponse({ type: User })
+  @ApiBadRequestResponse()
   @Post('/createUser')
   createUser(@Body() body: CreateUserDto): User {
     return this.userService.createUser(body);

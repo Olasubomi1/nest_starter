@@ -14,4 +14,8 @@ export class User {
   @ApiProperty()
   @Column()
   alias: string;
+
+  @ApiProperty()
+  @Column()
+  age: number;
 }
